@@ -16,34 +16,39 @@ if (!function_exists('add_action')) {
 class FrontendSpider {
 
     /**
+     * @package FrontendSpider -> globals
+     * Global variables
+     */
+    public $page_id;
+    public $scripts = [];
+    public $styles = [];
+
+    /**
      * @package FrontendSpider -> "__construct"
      * Class constructor
      */
     public function __construct() {
-        add_action('wp_print_scripts', array($this, 'get_enqueued_scripts'));
+        $this->page_id = get_queried_object_id();
+        global $wp_scripts;
+        foreach ($wp_scripts->queue as $script) {
+            array_push($this->scripts, $script);
+        }
+        global $wp_styles;
+        foreach ($wp_styles->queue as $style) {
+            array_push($this->styles, $style);
+        }
     }
 
     /**
-     * @package FrontendSpider -> "get_enqueued_scripts"
-     * Scraping global $wp_scripts right before printing
+     * @package FrontendSpider -> "prepare_scripts_for_database"
+     * Serializing data for transient storage
      */
-    public function get_enqueued_scripts() {
-        if (!get_transient('wp_scrape_update_pageid_' . $page_id)) {
-            global $wp_scripts;
-            global $wp_styles;
-            $scripts = [];
-            foreach ($wp_scripts->queue as $script) {
-                array_push($scripts, $script);
-            }
-            $styles = [];
-            foreach ($wp_styles->queue as $style) {
-                array_push($styles, $style);
-            }
-            $page_id = get_queried_object_id();
-            set_transient('wp_scraped_scripts_pageid_' . $page_id, $scripts);
-            set_transient('wp_scraped_styles_pageid_' . $page_id, $styles);
-            set_transient('wp_scrape_update_pageid_' . $page_id, 'waiting for updates..', 604800);
-        }
+    public function prepare_transient_data() {
+        $pack = array(
+            'scripts' => serialize($this->scripts),
+            'styles'  => serialize($this->styles)     
+        );
+        return $pack;
     }
 
 }

@@ -40,6 +40,7 @@ class WPScriptManager {
         add_filter('plugin_action_links' . $this->plugin_filename, array($this, 'setup_plugin_settings_link'));
         add_action('add_meta_boxes', array($this, 'setup_meta_box'));
         add_action('admin_enqueue_scripts', array($this, 'admin_assets_enqueue'));
+        add_action('wp_print_scripts', array($this, 'scripts_scraper_init'));
     }
 
     /**
@@ -117,6 +118,22 @@ class WPScriptManager {
         }
     }
 
+    /**
+     * @package WpScriptManager -> "scripts_scraper_init"
+     * Scraping global $wp_scripts right before printing   
+     */
+    public function scripts_scraper_init() {
+        if (!is_admin()) {
+            require_once plugin_dir_path(__FILE__).'class-frontend-spider.php';
+            if(class_exists('FrontendSpider')) {
+                $frontend_spider = new FrontendSpider();
+                $package = $frontend_spider->prepare_transient_data();
+                set_transient('wp_queued_scripts_pageid_' . $frontend_spider->page_id, $package['scripts'], 604800);
+                set_transient('wp_queued_styles_pageid_' . $frontend_spider->page_id, $package['styles'], 604800);
+            }
+        }
+    }
+
 }
 
 /**
@@ -125,10 +142,4 @@ class WPScriptManager {
  */
 if(class_exists('WpScriptManager')) {
     $script_manager = new WpScriptManager();
-}
-if (!is_admin()) {
-    require_once plugin_dir_path(__FILE__).'class-frontend-spider.php';
-    if(class_exists('FrontendSpider')) {
-        $frontend_spider = new FrontendSpider();
-    }
 }
