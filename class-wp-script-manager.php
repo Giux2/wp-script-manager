@@ -120,7 +120,7 @@ class WPScriptManager {
 
     /**
      * @package WpScriptManager -> "scripts_scraper_init"
-     * Scraping global $wp_scripts right before printing   
+     * Scraping global $wp_scripts right before printing  
      */
     public function scripts_scraper_init() {
         if (!is_admin()) {
