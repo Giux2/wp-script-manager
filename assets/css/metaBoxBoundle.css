@@ -15,3 +15,13 @@ table.table-initable td.status {
 button#clear-transients {
     margin: 15px 0;
 }
+div.trimmer {
+	background: #000;
+	height: 1px;
+	margin: 35px 0 25px 0;
+}
+h2.table-title {
+	font-size: 20px !important;
+	font-weight: 500 !important;
+	text-align: center;
+}

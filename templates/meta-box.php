@@ -16,13 +16,9 @@ ob_start();
 
     <div class="dashboard-container">
         <div class="ui-container">
-
-            <!-- Global Controls -->
-            <div class="global-controls">
-                <button id="clear-transients" data-pageid="<?php echo $post->ID; ?>"> Clear Transients </button>
-            </div>
             
             <!-- Scripts Block -->
+            <h2 class="table-title"> Enqueued Scripts </h2>
             <div class="ui-scripts-block">
                 <table id="scripts-table" class="table-initable">
                     <thead>
@@ -50,7 +46,10 @@ ob_start();
                 </table>
             </div>
 
+            <div class="trimmer"></div>
+
             <!-- Styles Block -->
+            <h2 class="table-title"> Enqueued Styles </h2>
             <div class="ui-styles-block">
                 <table id="styles-table" class="table-initable">
                     <thead>
@@ -76,6 +75,14 @@ ob_start();
                         <?php } ?>    
                     </tbody>
                 </table>
+            </div>
+
+            <div class="trimmer"></div>
+
+            <!-- Global Controls -->
+            <h2 class="table-title"> Controls </h2>
+            <div class="global-controls">
+                <button id="clear-transients" data-pageid="<?php echo $post->ID; ?>"> Clear Transients </button>
             </div>
 
         </div>    
