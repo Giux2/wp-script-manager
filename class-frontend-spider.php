@@ -19,7 +19,6 @@ class FrontendSpider {
      * @package FrontendSpider -> globals
      * Global variables
      */
-    public $page_id;
     public $scripts = [];
     public $styles = [];
 
@@ -28,7 +27,6 @@ class FrontendSpider {
      * Class constructor
      */
     public function __construct() {
-        $this->page_id = get_queried_object_id();
         global $wp_scripts;
         foreach ($wp_scripts->queue as $script) {
             array_push($this->scripts, $script);

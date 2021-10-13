@@ -4,7 +4,6 @@
  * @package wp-script-manager
  * Metabox output
  */
-
 if (!function_exists('add_action')) {
     die('Dang! You should not be here dumbass! Be gone!');
 }
@@ -17,6 +16,11 @@ ob_start();
 
     <div class="dashboard-container">
         <div class="ui-container">
+
+            <!-- Global Controls -->
+            <div class="global-controls">
+                <button id="clear-transients" data-pageid="<?php echo $post->ID; ?>"> Clear Transients </button>
+            </div>
             
             <!-- Scripts Block -->
             <div class="ui-scripts-block">
@@ -30,19 +34,18 @@ ob_start();
                     </thead>
                     <tbody>
                         <?php 
-                        foreach ($scripts as $script) {
-                            echo '<tr>
-                                <td class="names"> '. $script .' </td>
+                        foreach ($scripts as $script) { ?>
+                            <tr>
+                                <td class="names"> <?php echo $script; ?> </td>
                                 <td class="actions"> 
-                                    <span class="dashicons dashicons-thumbs-up"></span>
-                                    <span class="dashicons dashicons-thumbs-down"></span>
+                                    <span class="dashicons dashicons-edit"></span> 
+                                    <span class="dashicons dashicons-update"></span>
                                 </td>
                                 <td class="status"> 
                                     <span class="dashicons dashicons-yes-alt"></span>
                                 </td>
-                            </tr>';
-                        }    
-                        ?>
+                            </tr>
+                        <?php } ?>    
                     </tbody>
                 </table>
             </div>
@@ -59,9 +62,9 @@ ob_start();
                     </thead>
                     <tbody>
                         <?php 
-                        foreach ($styles as $style) {
-                            echo '<tr>
-                                <td class="name"> '. $style .' </td>
+                        foreach ($styles as $style) { ?>
+                            <tr>
+                                <td class="name"> <?php echo $style; ?> </td>
                                 <td class="actions"> 
                                     <span class="dashicons dashicons-edit"></span> 
                                     <span class="dashicons dashicons-update"></span>
@@ -69,9 +72,8 @@ ob_start();
                                <td class="status"> 
                                     <span class="dashicons dashicons-yes-alt"></span>
                                </td> 
-                            </tr>';
-                        }    
-                        ?>
+                            </tr>
+                        <?php } ?>    
                     </tbody>
                 </table>
             </div>

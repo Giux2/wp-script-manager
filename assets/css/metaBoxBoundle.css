@@ -1,28 +1,17 @@
-div.ui-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    column-gap: 25px;
-    row-gap: 25px;
-}
 table.table-initable tr.even {
     background: #00000025;
 }
 table.table-initable th.sorting {
     text-align: left;
 }
-table.table-initable td.actions > * {
-    position: relative;
-    left: 8px;
-}
-table.table-initable td.status > * {
-    position: relative;
-    left: 16px;
-}
-.dataTables_wrapper .dataTables_filter input {
+table.table-initable td {
     width: 100%;
-    height: 15px;
 }
-.dataTables_wrapper .dataTables_filter {
-    float: left;
-    text-align: left;
+table.table-initable td.actions,
+table.table-initable td.status {
+	position: relative;
+	left: 12px;
+}
+button#clear-transients {
+    margin: 15px 0;
 }

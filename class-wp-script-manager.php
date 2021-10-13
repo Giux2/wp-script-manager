@@ -126,10 +126,14 @@ class WPScriptManager {
         if (!is_admin()) {
             require_once plugin_dir_path(__FILE__).'class-frontend-spider.php';
             if(class_exists('FrontendSpider')) {
-                $frontend_spider = new FrontendSpider();
-                $package = $frontend_spider->prepare_transient_data();
-                set_transient('wp_queued_scripts_pageid_' . $frontend_spider->page_id, $package['scripts'], 604800);
-                set_transient('wp_queued_styles_pageid_' . $frontend_spider->page_id, $package['styles'], 604800);
+                global $post;
+                $update = get_transient('wp_queued_scripts_pageid_' . $post->ID);
+                if (!$update) {
+                    $frontend_spider = new FrontendSpider();
+                    $package = $frontend_spider->prepare_transient_data();
+                    set_transient('wp_queued_scripts_pageid_' . $post->ID, $package['scripts'], 604800);
+                    set_transient('wp_queued_styles_pageid_' . $post->ID, $package['styles'], 604800);
+                }
             }
         }
     }
@@ -138,7 +142,7 @@ class WPScriptManager {
 
 /**
  * @package WpScriptManager
- * Classes Init
+ * Class Init
  */
 if(class_exists('WpScriptManager')) {
     $script_manager = new WpScriptManager();

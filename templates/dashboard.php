@@ -4,7 +4,6 @@
  * @package wp-script-manager
  * Dashboard page output
  */
-
 if (!function_exists('add_action')) {
     die('Dang! You should not be here dumbass! Be gone!');
 }
