@@ -25,14 +25,16 @@ jQuery.noConflict();
          * @package metaBoxBoundle
          * Clear transient request
          */
-        $('#clear-transients').click(function(){
+        $('#clear-transients').click(function(event) {
+            event.preventDefault;
             $.ajax({
                 type: 'POST',
                 dataType: 'HTML',
                 url: metaBox.ajaxUrl,
                 data: {
                     action: 'clear_spiders_transients', 
-                    pageId: $(this).attr('data-pageid')
+                    pageId: $(this).attr('data-pageid'),
+                    nonce: metaBox.ajaxNonce
                 },
                 success: function(response) {
                     console.log(response);
