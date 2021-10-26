@@ -1,27 +1,27 @@
-table.table-initable tr.even {
-    background: #00000025;
-}
-table.table-initable th.sorting {
-    text-align: left;
-}
-table.table-initable td {
+div.ui-container table {
     width: 100%;
+	height: auto;
+	text-align: left;
 }
-table.table-initable td.actions,
-table.table-initable td.status {
-	position: relative;
-	left: 12px;
+div.ui-container td.names {
+    width: 60%;
+	height: auto;
+	text-align: left;
 }
-button#clear-transients {
-    margin: 15px 0;
+div.ui-container td.actions {
+    width: 20%;
+	height: auto;
+	text-align: left;
 }
-div.trimmer {
-	background: #000;
-	height: 1px;
-	margin: 35px 0 25px 0;
+div.ui-container td.status {
+    width: 20%;
+	height: auto;
+	text-align: left;
 }
-h2.table-title {
-	font-size: 20px !important;
-	font-weight: 500 !important;
-	text-align: center;
+div.ui-container td.actions {
+    width: 20%;
+}
+div.ui-container div.ui-scripts-block,
+div.ui-container div.ui-styles-block {
+    margin-bottom: 25px;
 }

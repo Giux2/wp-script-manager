@@ -19,6 +19,7 @@ class MetaboxAjax {
      * Class constructor
      */
     public function __construct() {
+        die('1');
         add_action('wp_ajax_ultime_novita_home', array($this, 'clear_spiders_transients'));
         add_action('wp_ajax_nopriv_ultime_novita_home', array($this, 'clear_spiders_transients'));
         add_action('admin_enqueue_scripts', array($this, 'ajax_script_localizer'));

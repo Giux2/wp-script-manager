@@ -41,6 +41,9 @@ class WPScriptManager {
         add_action('add_meta_boxes', array($this, 'setup_meta_box'));
         add_action('admin_enqueue_scripts', array($this, 'admin_assets_enqueue'));
         add_action('wp_print_scripts', array($this, 'scripts_scraper_init'));
+        add_action('wp_ajax_clear_spiders_transients', array($this, 'clear_spiders_transients'));
+        add_action('wp_ajax_nopriv_clear_spiders_transients', array($this, 'clear_spiders_transients'));
+        add_action('admin_enqueue_scripts', array($this, 'ajax_script_localizer'));
     }
 
     /**
@@ -107,13 +110,9 @@ class WPScriptManager {
     public function admin_assets_enqueue() {
         global $post;
         if ($post->post_type === 'page') {
-            wp_register_style('datatable-styles', plugins_url('assets/css/dataTable.min.css', __FILE__));
             wp_register_style('metabox-styles-boundle', plugins_url('assets/css/metaBoxBoundle.css', __FILE__));
-            wp_enqueue_style('datatable-styles');
             wp_enqueue_style('metabox-styles-boundle');
-            wp_register_script('datatable-scripts', plugins_url('assets/js/dataTable.min.js', __FILE__), array ('jquery'), false, true);
             wp_register_script('metabox-scripts-boundle', plugins_url('assets/js/metaBoxBoundle.js', __FILE__), array ('jquery'), false, true);
-            wp_enqueue_script('datatable-scripts');
             wp_enqueue_script('metabox-scripts-boundle');
         }
     }
@@ -136,6 +135,30 @@ class WPScriptManager {
                 }
             }
         }
+    }
+
+    /**
+     * @package WPScriptManager -> "clear_spiders_transients"
+     * Delete spider transients action
+     */
+    public function clear_spiders_transients() {
+        if (!wp_verify_nonce($_POST['nonce'], 'clear_spiders_transients_nonce')) {
+            die('You should not be here dumbass! Be Gone!');
+        }
+        delete_transient('wp_queued_scripts_pageid_' . $_POST['page_id']);
+        echo 'Success!';
+        die();
+    }
+
+    /**
+     * @package WPScriptManager -> "ajax_script_localizer"
+     * Passing variables to JS
+     */
+    public function ajax_script_localizer() {
+        wp_localize_script('metabox-scripts-boundle', 'metaBox', array( 
+            'ajaxUrl'   => admin_url('admin-ajax.php'),
+            'ajaxNonce' => wp_create_nonce('clear_spiders_transients_nonce')
+        ));       
     }
 
 }
