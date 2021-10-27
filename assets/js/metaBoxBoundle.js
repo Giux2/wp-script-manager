@@ -12,11 +12,6 @@ jQuery.noConflict();
      */
     const logs = $('#ajax-log-resp');
     const loader = $('#loader-id');
-    const noPageIdProvided = 'Error! No page id was provided!';
-    const transientsAltreadyClear = 'Transients already clear!';
-    const transientsDeleted = 'Transients deleted!';
-    const casualResponse = 'Something went wrong whit your request! Refresh the page and try again..';
-    const scrapeOk = 'Done! Page lookup completed correctly!';
     
     /**
      * @package metaBoxBoundle
@@ -36,33 +31,28 @@ jQuery.noConflict();
             },
             success: function(response) {
                 if (typeof response === 'string') {
+                    let responseText = '';
                     switch (response) {
                         case 'no-page-id-provided':
-                            logs.text(noPageIdProvided)
-                            .show()
-                            .delay(2500)
-                            .fadeOut(400);
+                            responseText = 'Error! No page id was provided!';
                             break;
                         case 'transient-already-clear':
-                            logs.text(transientsAltreadyClear)
-                            .show()
-                            .delay(2500)
-                            .fadeOut(400);
+                            responseText = 'Transients already clear!';
                             break;
                         default: 
-                            logs.text(transientsDeleted)
-                            .show()
-                            .delay(2500)
-                            .fadeOut(400);
+                        responseText = 'Transients deleted!';
                     }
+                    logs.text(responseText)
+                        .show()
+                        .delay(2500)
+                        .fadeOut(400);
                 } else {
-                   logs.text(casualResponse);
+                   logs.text('Something went wrong whit your request! Please refresh the page and try again..');
                 }
                 loader.fadeOut(400);
             },
             error: function(err) {
                 console.log(err);
-                logs.text(casualResponse);
             }
         });
     });
@@ -75,7 +65,7 @@ jQuery.noConflict();
         event.preventDefault;
         loader.fadeIn(400);
         $.get(metaBox.pageUrl).done(function() {
-            logs.text(scrapeOk)
+            logs.text('Done! Page lookup completed correctly!')
                 .show()
                 .delay(2500)
                .fadeOut(400);
