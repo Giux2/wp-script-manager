@@ -25,3 +25,31 @@ div.ui-container div.ui-scripts-block,
 div.ui-container div.ui-styles-block {
     margin-bottom: 25px;
 }
+div#ajax-log-resp {
+    margin-top: 15px;
+}
+div.global-controls button:hover {
+	cursor: pointer;
+}
+td.actions span {
+	transition-property: all;
+	transition-duration: .1s;
+}
+td.actions span:hover {
+	cursor: pointer;
+	transform: scale(1.1);
+}
+div.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #1d2327;
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    animation: spin 2s linear infinite;
+    float: left;
+    margin-right: 18px;
+}
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}

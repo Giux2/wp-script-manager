@@ -82,7 +82,7 @@ class WPScriptManager {
 
     /**
      * @package WpScriptManager -> "setup_plugin_settings_link"
-     * Setting up metabox on post_type = post, callback on "wp_script_manager_metabox_callback"
+     * Setting up metabox on post_type = page, callback on "wp_script_manager_metabox_callback"
      */
     public function setup_meta_box() {
         add_meta_box( 
@@ -145,8 +145,18 @@ class WPScriptManager {
         if (!wp_verify_nonce($_POST['nonce'], 'clear_spiders_transients_nonce')) {
             die('You should not be here dumbass! Be Gone!');
         }
-        delete_transient('wp_queued_scripts_pageid_' . $_POST['page_id']);
-        echo 'Success!';
+        if (!$_POST['page_id'] || $_POST['page_id'] == '') {
+            echo 'no-page-id-provided';
+        } else {
+            $transients = get_transient('wp_queued_scripts_pageid_' . $_POST['page_id']);
+            if (!$transients || $transients == '') {
+                echo 'transient-already-clear';    
+            } else {
+                delete_transient('wp_queued_scripts_pageid_' . $_POST['page_id']);
+                delete_transient('wp_queued_styles_pageid_' . $_POST['page_id']);
+                echo 'transients-cleared';
+            }
+        }
         die();
     }
 
@@ -157,7 +167,8 @@ class WPScriptManager {
     public function ajax_script_localizer() {
         wp_localize_script('metabox-scripts-boundle', 'metaBox', array( 
             'ajaxUrl'   => admin_url('admin-ajax.php'),
-            'ajaxNonce' => wp_create_nonce('clear_spiders_transients_nonce')
+            'ajaxNonce' => wp_create_nonce('clear_spiders_transients_nonce'),
+            'pageUrl'   => get_post_permalink()
         ));       
     }
 

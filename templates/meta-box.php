@@ -31,17 +31,19 @@ ob_start();
                             </tr>    
                         </thead>
                         <tbody>
-                            <?php 
-                            foreach ($scripts as $script) { ?>
-                                <tr>
-                                    <td class="names"> <?php echo $script; ?> </td>
-                                    <td class="actions"> 
-                                        <span class="dashicons dashicons-dismiss"></span> 
-                                        <span class="dashicons dashicons-yes-alt"></span>
-                                    </td>
-                                    <td class="status"> Enqueued </td>
-                                </tr>
-                            <?php } ?>    
+                            <?php
+                            if ($scripts && $scripts != '') {
+                                foreach ($scripts as $script) { ?>
+                                    <tr>
+                                        <td class="names"> <?php echo $script; ?> </td>
+                                        <td class="actions"> 
+                                            <span class="dashicons dashicons-dismiss"></span> 
+                                            <span class="dashicons dashicons-yes-alt"></span>
+                                        </td>
+                                        <td class="status"> Enqueued </td>
+                                    </tr>
+                                <?php } 
+                            } ?>    
                         </tbody>
                     </table>
                 </div>
@@ -57,17 +59,19 @@ ob_start();
                             </tr>    
                         </thead>
                         <tbody>
-                            <?php 
-                            foreach ($styles as $style) { ?>
-                                <tr>
-                                    <td class="name"> <?php echo $style; ?> </td>
-                                    <td class="actions"> 
-                                        <span class="dashicons dashicons-dismiss"></span> 
-                                        <span class="dashicons dashicons-yes-alt"></span>
-                                    </td>
-                                   <td class="status"> Enqueued </td> 
-                                </tr>
-                            <?php } ?>    
+                            <?php
+                            if ($styles && $styles != '') { 
+                                foreach ($styles as $style) { ?>
+                                    <tr>
+                                        <td class="name"> <?php echo $style; ?> </td>
+                                        <td class="actions"> 
+                                            <span class="dashicons dashicons-dismiss"></span> 
+                                            <span class="dashicons dashicons-yes-alt"></span>
+                                        </td>
+                                       <td class="status"> Enqueued </td> 
+                                    </tr>
+                                <?php }
+                            } ?>    
                         </tbody>
                     </table>
                 </div>
@@ -77,8 +81,10 @@ ob_start();
 
             <!-- Global Controls -->
             <div class="global-controls">
+                <button type="button" id="scrape-page"> Page Lookup </button>
                 <button type="button" id="clear-transients" data-pageid="<?php echo $post->ID; ?>"> Clear Transients </button>
-                <p id="ajax-log-resp"></p>
+                <div class="loader" id="loader-id" style="display: none;"></div>
+                <div id="ajax-log-resp"></div>
             </div>
 
         </div>    

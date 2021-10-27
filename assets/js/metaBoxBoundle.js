@@ -5,6 +5,18 @@
 jQuery.noConflict();
 (function($) {
     'use-strict';
+
+    /**
+     * @package metaBoxBoundle
+     * Global variables
+     */
+    const logs = $('#ajax-log-resp');
+    const loader = $('#loader-id');
+    const noPageIdProvided = 'Error! No page id was provided!';
+    const transientsAltreadyClear = 'Transients already clear!';
+    const transientsDeleted = 'Transients deleted!';
+    const casualResponse = 'Something went wrong whit your request! Refresh the page and try again..';
+    const scrapeOk = 'Done! Page lookup completed correctly!';
     
     /**
      * @package metaBoxBoundle
@@ -12,6 +24,7 @@ jQuery.noConflict();
      */
     $('#clear-transients').click(function(event) {
         event.preventDefault;
+        loader.fadeIn(400);
         $.ajax({
             type: "post",
             dataType: "html",
@@ -22,14 +35,52 @@ jQuery.noConflict();
                 page_id: $(this).attr('data-pageid')
             },
             success: function(response) {
-                console.log(response);
-                $('#ajax-log-resp').text('Success! Transients cleared!');
+                if (typeof response === 'string') {
+                    switch (response) {
+                        case 'no-page-id-provided':
+                            logs.text(noPageIdProvided)
+                            .show()
+                            .delay(2500)
+                            .fadeOut(400);
+                            break;
+                        case 'transient-already-clear':
+                            logs.text(transientsAltreadyClear)
+                            .show()
+                            .delay(2500)
+                            .fadeOut(400);
+                            break;
+                        default: 
+                            logs.text(transientsDeleted)
+                            .show()
+                            .delay(2500)
+                            .fadeOut(400);
+                    }
+                } else {
+                   logs.text(casualResponse);
+                }
+                loader.fadeOut(400);
             },
             error: function(err) {
                 console.log(err);
-                $('#ajax-log-resp').text('Error! Something went wrong whit your request!');
+                logs.text(casualResponse);
             }
         });
-
     });
+
+    /**
+     * @package metaBoxBoundle
+     * Fires frontend spider
+     */
+    $('#scrape-page').click(function(event) {
+        event.preventDefault;
+        loader.fadeIn(400);
+        $.get(metaBox.pageUrl).done(function() {
+            logs.text(scrapeOk)
+                .show()
+                .delay(2500)
+               .fadeOut(400);
+            loader.fadeOut(400);
+        });
+    });
+
 })(jQuery);
