@@ -5,13 +5,6 @@
 jQuery.noConflict();
 (function($) {
     'use-strict';
-
-    /**
-     * @package metaBoxBoundle
-     * Global variables
-     */
-    const logs = $('#ajax-log-resp');
-    const loader = $('#loader-id');
     
     /**
      * @package metaBoxBoundle
@@ -19,7 +12,7 @@ jQuery.noConflict();
      */
     $('#clear-transients').click(function(event) {
         event.preventDefault;
-        loader.fadeIn(400);
+        $('#loader-id').fadeIn(400);
         $.ajax({
             type: "POST",
             dataType: "html",
@@ -27,7 +20,7 @@ jQuery.noConflict();
             data: {
                 action: "clear_spiders_transients",
                 nonce: metaBox.ajaxNonce,
-                page_id: $(this).attr('data-pageid')
+                page_id: $('#dashboard-container-id').attr('data-pageid')
             },
             success: function(response) {
                 if (typeof response === 'string') {
@@ -42,14 +35,12 @@ jQuery.noConflict();
                         default: 
                         responseText = 'Transients deleted!';
                     }
-                    logs.text(responseText)
-                        .show()
-                        .delay(2500)
-                        .fadeOut(400);
+                    $('#ajax-log-resp').text(responseText);
+                    refreshTables();
                 } else {
-                   logs.text('Something went wrong whit your request! Please refresh the page and try again..');
+                    $('#ajax-log-resp').text('Something went wrong whit your request! Please refresh the page and try again..');
                 }
-                loader.fadeOut(400);
+                $('#loader-id').hide();
             },
             error: function(err) {
                 console.log(err);
@@ -63,14 +54,43 @@ jQuery.noConflict();
      */
     $('#scrape-page').click(function(event) {
         event.preventDefault;
-        loader.fadeIn(400);
+        $('#loader-id').fadeIn(400);
         $.get(metaBox.pageUrl).done(function() {
-            logs.text('Done! Page lookup completed correctly!')
-                .show()
-                .delay(2500)
-               .fadeOut(400);
-            loader.fadeOut(400);
+            $('#ajax-log-resp').text('Done! Page lookup completed correctly!');
+            $('#loader-id').hide();
+            refreshTables();
         });
+    });
+
+    /**
+     * @package metaBoxBoundle
+     * Fires frontend spider
+     */
+    function refreshTables() {
+        $.ajax({
+            type: "POST",
+            dataType: "html",
+            url: metaBox.ajaxUrl,
+            data: {
+                action: "refresh_tables",
+                nonce: metaBox.ajaxNonce,
+                page_id: $('#dashboard-container-id').attr('data-pageid')
+            },
+            success: function(response) {
+                $('#ui-refresh-target').html(response);
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    }
+
+    /**
+     * @package metaBoxBoundle
+     * Init
+     */
+    $(document).ready(function(){
+        refreshTables();
     });
 
 })(jQuery);

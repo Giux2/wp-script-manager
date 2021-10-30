@@ -43,6 +43,8 @@ class WPScriptManager {
         add_action('wp_print_scripts', array($this, 'scripts_scraper_init'));
         add_action('wp_ajax_clear_spiders_transients', array($this, 'clear_spiders_transients'));
         add_action('wp_ajax_nopriv_clear_spiders_transients', array($this, 'clear_spiders_transients'));
+        add_action('wp_ajax_refresh_tables', array($this, 'refresh_tables'));
+        add_action('wp_ajax_nopriv_refresh_tables', array($this, 'refresh_tables'));
         add_action('admin_enqueue_scripts', array($this, 'ajax_script_localizer'));
     }
 
@@ -142,7 +144,7 @@ class WPScriptManager {
      * Delete spider transients action
      */
     public function clear_spiders_transients() {
-        if (!wp_verify_nonce($_POST['nonce'], 'clear_spiders_transients_nonce')) {
+        if (!wp_verify_nonce($_POST['nonce'], 'metabox_nonce')) {
             die('You should not be here dumbass! Be Gone!');
         }
         if (!$_POST['page_id'] || $_POST['page_id'] == '') {
@@ -161,13 +163,90 @@ class WPScriptManager {
     }
 
     /**
+     * @package WPScriptManager -> "refresh_tables"
+     * Refreshing tables
+     */
+    public function refresh_tables() {
+        if (!wp_verify_nonce($_POST['nonce'], 'metabox_nonce')) {
+            die('You should not be here dumbass! Be Gone!');
+        }
+        if (!$_POST['page_id'] || $_POST['page_id'] == '') {
+            echo 'no-page-id-provided';
+            die();
+        } else {
+            $scripts = unserialize(get_transient('wp_queued_scripts_pageid_' . $_POST['page_id']));
+            $styles = unserialize(get_transient('wp_queued_styles_pageid_' . $_POST['page_id']));
+        }
+        ob_start();
+        ?>
+        <div class="ui-scripts-block">
+            <table id="scripts-table" class="table-initable">
+                <thead>
+                    <tr>
+                        <th> Name </th>
+                        <th> Actions </th>
+                        <th> Status </th>
+                    </tr>    
+                </thead>
+                <tbody>
+                    <?php
+                    if ($scripts && $scripts != '') {
+                        foreach ($scripts as $script) { ?>
+                            <tr>
+                                <td class="names"> <?php echo $script; ?> </td>
+                                <td class="actions"> 
+                                    <span class="dashicons dashicons-dismiss"></span> 
+                                    <span class="dashicons dashicons-yes-alt"></span>
+                                </td>
+                                <td class="status"> Enqueued </td>
+                            </tr>
+                        <?php } 
+                    } ?>    
+                </tbody>
+            </table>
+        </div>
+        <div class="ui-styles-block">
+            <table id="styles-table" class="table-initable">
+                <thead>
+                    <tr>
+                        <th> Name </th>
+                        <th> Actions </th>
+                        <th> Status </th>
+                    </tr>    
+                </thead>
+                <tbody>
+                    <?php
+                    if ($styles && $styles != '') { 
+                        foreach ($styles as $style) { ?>
+                            <tr>
+                                <td class="name"> <?php echo $style; ?> </td>
+                                <td class="actions"> 
+                                    <span class="dashicons dashicons-dismiss"></span> 
+                                    <span class="dashicons dashicons-yes-alt"></span>
+                                </td>
+                            <td class="status"> Enqueued </td> 
+                            </tr>
+                        <?php }
+                    } ?>    
+                </tbody>
+            </table>
+        </div>
+        <?php
+        $html = ob_get_contents();
+        ob_get_clean();
+        echo $html;
+        die();
+    }
+
+    /**
      * @package WPScriptManager -> "ajax_script_localizer"
      * Passing variables to JS
      */
     public function ajax_script_localizer() {
+        global $post;
         wp_localize_script('metabox-scripts-boundle', 'metaBox', array( 
             'ajaxUrl'   => admin_url('admin-ajax.php'),
-            'ajaxNonce' => wp_create_nonce('clear_spiders_transients_nonce'),
+            'ajaxNonce' => wp_create_nonce('metabox_nonce'),
             'pageUrl'   => get_post_permalink()
         ));       
     }
