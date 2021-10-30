@@ -15,13 +15,13 @@ jQuery.noConflict();
     
     /**
      * @package metaBoxBoundle
-     * Clear transient request
+     * Clears transients
      */
     $('#clear-transients').click(function(event) {
         event.preventDefault;
         loader.fadeIn(400);
         $.ajax({
-            type: "post",
+            type: "POST",
             dataType: "html",
             url: metaBox.ajaxUrl,
             data: {
