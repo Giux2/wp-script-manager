@@ -21,8 +21,8 @@ ob_start();
                 <button type="button" id="scrape-page"> Page Lookup </button>
                 <button type="button" id="clear-transients"> Clear Transients </button>
                 <div class="response-grid">
-                    <div class="loader" id="loader-id" style="display: none;"></div>    
                     <div id="ajax-log-resp"></div>
+                    <div class="loader" id="loader-id" style="display: none;"></div>    
                 </div>
             </div>
         </div>    

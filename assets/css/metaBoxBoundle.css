@@ -21,6 +21,13 @@ div.ui-container td.status {
 div.ui-container td.actions {
     width: 20%;
 }
+h2.table-title {
+    margin: 0 0 5px 0px!important;
+    padding: 0!important;
+    font-size: 16px!important;
+    font-weight: 500!important;
+    text-decoration: underline;
+}
 div.ui-container div.ui-scripts-block,
 div.ui-container div.ui-styles-block {
     margin-bottom: 25px;

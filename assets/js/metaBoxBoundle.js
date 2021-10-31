@@ -12,7 +12,7 @@ jQuery.noConflict();
      */
     $('#clear-transients').click(function(event) {
         event.preventDefault;
-        $('#loader-id').fadeIn(400);
+        $('#loader-id').show();
         $.ajax({
             type: "POST",
             dataType: "html",
@@ -38,7 +38,8 @@ jQuery.noConflict();
                     $('#ajax-log-resp').text(responseText);
                     refreshTables();
                 } else {
-                    $('#ajax-log-resp').text('Something went wrong whit your request! Please refresh the page and try again..');
+                    $('#ajax-log-resp').text('Something went wrong whit your request! Check the browser console for more informations!');
+                    console.log(response);
                 }
                 $('#loader-id').hide();
             },
@@ -54,7 +55,7 @@ jQuery.noConflict();
      */
     $('#scrape-page').click(function(event) {
         event.preventDefault;
-        $('#loader-id').fadeIn(400);
+        $('#loader-id').show();
         $.get(metaBox.pageUrl).done(function() {
             $('#ajax-log-resp').text('Done! Page lookup completed correctly!');
             $('#loader-id').hide();
@@ -72,7 +73,7 @@ jQuery.noConflict();
             dataType: "html",
             url: metaBox.ajaxUrl,
             data: {
-                action: "refresh_tables",
+                action: "tables_generator",
                 nonce: metaBox.ajaxNonce,
                 page_id: $('#dashboard-container-id').attr('data-pageid')
             },
@@ -80,6 +81,7 @@ jQuery.noConflict();
                 $('#ui-refresh-target').html(response);
             },
             error: function(err) {
+                $('#ui-refresh-target').html('<p>Something went wrong! Check console for more informations!</p>');
                 console.log(err);
             }
         });
@@ -89,7 +91,7 @@ jQuery.noConflict();
      * @package metaBoxBoundle
      * Init
      */
-    $(document).ready(function(){
+    $(document).ready(function() {
         refreshTables();
     });
 

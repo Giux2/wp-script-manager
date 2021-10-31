@@ -42,9 +42,7 @@ class WPScriptManager {
         add_action('admin_enqueue_scripts', array($this, 'admin_assets_enqueue'));
         add_action('wp_print_scripts', array($this, 'scripts_scraper_init'));
         add_action('wp_ajax_clear_spiders_transients', array($this, 'clear_spiders_transients'));
-        add_action('wp_ajax_nopriv_clear_spiders_transients', array($this, 'clear_spiders_transients'));
-        add_action('wp_ajax_refresh_tables', array($this, 'refresh_tables'));
-        add_action('wp_ajax_nopriv_refresh_tables', array($this, 'refresh_tables'));
+        add_action('wp_ajax_tables_generator', array($this, 'tables_generator'));
         add_action('admin_enqueue_scripts', array($this, 'ajax_script_localizer'));
     }
 
@@ -163,10 +161,10 @@ class WPScriptManager {
     }
 
     /**
-     * @package WPScriptManager -> "refresh_tables"
-     * Refreshing tables
+     * @package WPScriptManager -> "tables_generator"
+     * Generating tables
      */
-    public function refresh_tables() {
+    public function tables_generator() {
         if (!wp_verify_nonce($_POST['nonce'], 'metabox_nonce')) {
             die('You should not be here dumbass! Be Gone!');
         }
@@ -180,6 +178,7 @@ class WPScriptManager {
         ob_start();
         ?>
         <div class="ui-scripts-block">
+            <h2 class="table-title"> Scripts </h2>
             <table id="scripts-table" class="table-initable">
                 <thead>
                     <tr>
@@ -195,8 +194,8 @@ class WPScriptManager {
                             <tr>
                                 <td class="names"> <?php echo $script; ?> </td>
                                 <td class="actions"> 
-                                    <span class="dashicons dashicons-dismiss"></span> 
-                                    <span class="dashicons dashicons-yes-alt"></span>
+                                    <span class="dashicons dashicons-dismiss" data-id="<?php echo $script; ?>"></span> 
+                                    <span class="dashicons dashicons-yes-alt" data-id="<?php echo $script; ?>"></span>
                                 </td>
                                 <td class="status"> Enqueued </td>
                             </tr>
@@ -206,6 +205,7 @@ class WPScriptManager {
             </table>
         </div>
         <div class="ui-styles-block">
+            <h2 class="table-title"> Styles </h2>
             <table id="styles-table" class="table-initable">
                 <thead>
                     <tr>
@@ -221,8 +221,8 @@ class WPScriptManager {
                             <tr>
                                 <td class="name"> <?php echo $style; ?> </td>
                                 <td class="actions"> 
-                                    <span class="dashicons dashicons-dismiss"></span> 
-                                    <span class="dashicons dashicons-yes-alt"></span>
+                                    <span class="dashicons dashicons-dismiss" data-id="<?php echo $style; ?>"></span> 
+                                    <span class="dashicons dashicons-yes-alt" data-id="<?php echo $style; ?>"></span>
                                 </td>
                             <td class="status"> Enqueued </td> 
                             </tr>
