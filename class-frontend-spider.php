@@ -2,7 +2,7 @@
 
 /**
  * @package wp-script-manager
- * Dashboard page output
+ * Handles scripts scraping
  */
 
 if (!function_exists('add_action')) {

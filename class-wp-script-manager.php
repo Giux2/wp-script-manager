@@ -43,6 +43,7 @@ class WPScriptManager {
         add_action('wp_print_scripts', array($this, 'scripts_scraper_init'));
         add_action('wp_ajax_clear_spiders_transients', array($this, 'clear_spiders_transients'));
         add_action('wp_ajax_tables_generator', array($this, 'tables_generator'));
+        add_action('wp_ajax_scripts_handler', array($this, 'scripts_handler'));
         add_action('admin_enqueue_scripts', array($this, 'ajax_script_localizer'));
     }
 
@@ -87,7 +88,7 @@ class WPScriptManager {
     public function setup_meta_box() {
         add_meta_box( 
             'wp_script_manager',
-            'Script Manager',
+            'WPScripts',
              array($this, 'wp_script_manager_callback'),
             'page',
             'normal',
@@ -194,8 +195,8 @@ class WPScriptManager {
                             <tr>
                                 <td class="names"> <?php echo $script; ?> </td>
                                 <td class="actions"> 
-                                    <span class="dashicons dashicons-dismiss" data-id="<?php echo $script; ?>"></span> 
-                                    <span class="dashicons dashicons-yes-alt" data-id="<?php echo $script; ?>"></span>
+                                    <span class="dashicons dashicons-dismiss" data-id="<?php echo $script; ?>" data-handler="dequeue"></span> 
+                                    <span class="dashicons dashicons-yes-alt" data-id="<?php echo $script; ?>" data-handler="enqueue"></span>
                                 </td>
                                 <td class="status"> Enqueued </td>
                             </tr>
@@ -235,6 +236,33 @@ class WPScriptManager {
         $html = ob_get_contents();
         ob_get_clean();
         echo $html;
+        die();
+    }
+
+    /**
+     * @package WPScriptManager -> "scripts_handler"
+     * Handles enqueue/dequeue
+     */
+    public function scripts_handler() {
+        if (!wp_verify_nonce($_POST['nonce'], 'metabox_nonce')) {
+            die('You should not be here dumbass! Be Gone!');
+        }
+        if (!$_POST['page_id'] || $_POST['page_id'] == '') {
+            echo 'no-page-id-provided';
+            die(); 
+        }
+        if (!$_POST['handler'] || $_POST['handler'] == '') {
+            echo 'no-handler-provided';
+            die(); 
+        }
+        switch ($_POST['handler']) {
+            case 'enqueue':
+                echo 'Enqueue!';
+                break;
+            case 'dequeue':
+                echo 'Dequeue!';
+                break;
+        }
         die();
     }
 

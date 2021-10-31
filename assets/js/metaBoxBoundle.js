@@ -65,6 +65,34 @@ jQuery.noConflict();
 
     /**
      * @package metaBoxBoundle
+     * Handles enqueue/dequeue event
+     */
+    function eventBinder() {
+        $('td.actions span.dashicons').click(function(event) {
+            event.preventDefault;
+            $.ajax({
+                type: "POST",
+                dataType: "html",
+                url: metaBox.ajaxUrl,
+                data: {
+                    action: "scripts_handler",
+                    nonce: metaBox.ajaxNonce,
+                    page_id: $('#dashboard-container-id').attr('data-pageid'),
+                    handler: $(this).attr('data-handler')
+                },
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(err) {
+                    $('#ui-refresh-target').html('<p>Something went wrong! Check console for more informations!</p>');
+                    console.log(err);
+                }
+            });
+        });
+    }
+
+    /**
+     * @package metaBoxBoundle
      * Fires frontend spider
      */
     function refreshTables() {
@@ -79,6 +107,7 @@ jQuery.noConflict();
             },
             success: function(response) {
                 $('#ui-refresh-target').html(response);
+                eventBinder();
             },
             error: function(err) {
                 $('#ui-refresh-target').html('<p>Something went wrong! Check console for more informations!</p>');
