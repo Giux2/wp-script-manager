@@ -93,7 +93,7 @@ jQuery.noConflict();
 
     /**
      * @package metaBoxBoundle
-     * Fires frontend spider
+     * Refresh tables
      */
     function refreshTables() {
         $.ajax({
