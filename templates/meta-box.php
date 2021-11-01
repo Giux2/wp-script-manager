@@ -9,8 +9,6 @@ if (!function_exists('add_action')) {
 }
 
 global $post;
-$scripts = unserialize(get_transient('wp_queued_scripts_pageid_' . $post->ID));
-$styles = unserialize(get_transient('wp_queued_styles_pageid_' . $post->ID));
 ob_start();
 ?>
 

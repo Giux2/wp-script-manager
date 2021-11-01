@@ -36,7 +36,7 @@ class WPScriptManager {
         $this->plugin_name = plugin_basename(__FILE__);
         $this->plugin_pagename = 'wp-script-manager';
         $this->plugin_menu_title = 'Script Manager';
-        add_action('admin_menu', array($this, 'setup_admin_dashboard'));
+        // add_action('admin_menu', array($this, 'setup_admin_dashboard'));
         add_filter('plugin_action_links' . $this->plugin_filename, array($this, 'setup_plugin_settings_link'));
         add_action('add_meta_boxes', array($this, 'setup_meta_box'));
         add_action('admin_enqueue_scripts', array($this, 'admin_assets_enqueue'));
@@ -65,7 +65,7 @@ class WPScriptManager {
 
     /**
      * @package WpScriptManager -> "admin_dashboard_output"
-     * Outputting dashboard template
+     * Output dashboard template
      */
     public function admin_dashboard_output() {
         require_once plugin_dir_path(__FILE__).'templates/dashboard.php';
@@ -120,19 +120,31 @@ class WPScriptManager {
 
     /**
      * @package WpScriptManager -> "scripts_scraper_init"
-     * Scraping global $wp_scripts right before printing  
+     * Scraping global $wp_scripts right before printing, applying scripts/styles dequeue
      */
     public function scripts_scraper_init() {
         if (!is_admin()) {
+            global $post;
+            $dequeued_scripts = unserialize(get_option('wp_dequeued_scripts_pageid_' . $post->ID));
+            if ($dequeued_scripts && $dequeued_scripts != '') {
+                foreach ($dequeued_scripts as $dequeued_script) {
+                    wp_dequeue_script($dequeued_script);
+                }
+            }
+            $dequeued_styles = unserialize(get_option('wp_dequeued_styles_pageid_' . $post->ID));
+            if ($dequeued_styles || $dequeued_styles != '') {
+                foreach ($dequeued_styles as $dequeued_style) {
+                    wp_dequeue_style($dequeued_style);
+                }
+            }
             require_once plugin_dir_path(__FILE__).'class-frontend-spider.php';
             if(class_exists('FrontendSpider')) {
-                global $post;
-                $update = get_transient('wp_queued_scripts_pageid_' . $post->ID);
+                $update = get_option('wp_queued_scripts_pageid_' . $post->ID);
                 if (!$update) {
                     $frontend_spider = new FrontendSpider();
                     $package = $frontend_spider->prepare_transient_data();
-                    set_transient('wp_queued_scripts_pageid_' . $post->ID, $package['scripts'], 604800);
-                    set_transient('wp_queued_styles_pageid_' . $post->ID, $package['styles'], 604800);
+                    update_option('wp_queued_scripts_pageid_' . $post->ID, $package['scripts']);
+                    update_option('wp_queued_styles_pageid_' . $post->ID, $package['styles']);
                 }
             }
         }
@@ -146,18 +158,10 @@ class WPScriptManager {
         if (!wp_verify_nonce($_POST['nonce'], 'metabox_nonce')) {
             die('You should not be here dumbass! Be Gone!');
         }
-        if (!$_POST['page_id'] || $_POST['page_id'] == '') {
-            echo 'no-page-id-provided';
-        } else {
-            $transients = get_transient('wp_queued_scripts_pageid_' . $_POST['page_id']);
-            if (!$transients || $transients == '') {
-                echo 'transient-already-clear';    
-            } else {
-                delete_transient('wp_queued_scripts_pageid_' . $_POST['page_id']);
-                delete_transient('wp_queued_styles_pageid_' . $_POST['page_id']);
-                echo 'transients-cleared';
-            }
-        }
+        delete_option('wp_queued_scripts_pageid_' . $_POST['page_id']);
+        delete_option('wp_queued_styles_pageid_' . $_POST['page_id']);
+        delete_option('wp_dequeued_scripts_pageid_' . $_POST['page_id']);
+        delete_option('wp_dequeued_styles_pageid_' . $_POST['page_id']);
         die();
     }
 
@@ -169,13 +173,10 @@ class WPScriptManager {
         if (!wp_verify_nonce($_POST['nonce'], 'metabox_nonce')) {
             die('You should not be here dumbass! Be Gone!');
         }
-        if (!$_POST['page_id'] || $_POST['page_id'] == '') {
-            echo 'no-page-id-provided';
-            die();
-        } else {
-            $scripts = unserialize(get_transient('wp_queued_scripts_pageid_' . $_POST['page_id']));
-            $styles = unserialize(get_transient('wp_queued_styles_pageid_' . $_POST['page_id']));
-        }
+        $scripts = unserialize(get_option('wp_queued_scripts_pageid_' . $_POST['page_id']));
+        $dequeued_scripts = unserialize(get_option('wp_dequeued_scripts_pageid_' . $_POST['page_id']));
+        $styles = unserialize(get_option('wp_queued_styles_pageid_' . $_POST['page_id']));
+        $dequeued_styles = unserialize(get_option('wp_dequeued_styles_pageid_' . $_POST['page_id']));
         ob_start();
         ?>
         <div class="ui-scripts-block">
@@ -195,12 +196,24 @@ class WPScriptManager {
                             <tr>
                                 <td class="names"> <?php echo $script; ?> </td>
                                 <td class="actions"> 
-                                    <span class="dashicons dashicons-dismiss" data-id="<?php echo $script; ?>" data-handler="dequeue"></span> 
-                                    <span class="dashicons dashicons-yes-alt" data-id="<?php echo $script; ?>" data-handler="enqueue"></span>
+                                    <span class="dashicons dashicons-dismiss" data-id="<?php echo $script; ?>" data-handler="dequeue" data-type="scripts"></span> 
+                                    <span class="dashicons dashicons-yes-alt" data-id="<?php echo $script; ?>" data-handler="enqueue" data-type="scripts"></span>
                                 </td>
                                 <td class="status"> Enqueued </td>
                             </tr>
                         <?php } 
+                    } 
+                    if ($dequeued_scripts && $dequeued_scripts != '') {
+                        foreach ($dequeued_scripts as $dequeued_script) { ?>
+                            <tr>
+                                <td class="names"> <?php echo $dequeued_script; ?> </td>
+                                <td class="actions"> 
+                                    <span class="dashicons dashicons-dismiss" data-id="<?php echo $dequeued_script; ?>" data-handler="dequeue" data-type="scripts"></span> 
+                                    <span class="dashicons dashicons-yes-alt" data-id="<?php echo $dequeued_script; ?>" data-handler="enqueue" data-type="scripts"></span>
+                                </td>
+                                <td class="status"> Dequeued </td>
+                            </tr>
+                        <?php }
                     } ?>    
                 </tbody>
             </table>
@@ -222,10 +235,22 @@ class WPScriptManager {
                             <tr>
                                 <td class="name"> <?php echo $style; ?> </td>
                                 <td class="actions"> 
-                                    <span class="dashicons dashicons-dismiss" data-id="<?php echo $style; ?>"></span> 
-                                    <span class="dashicons dashicons-yes-alt" data-id="<?php echo $style; ?>"></span>
+                                    <span class="dashicons dashicons-dismiss" data-id="<?php echo $style; ?>" data-handler="dequeue" data-type="styles"></span> 
+                                    <span class="dashicons dashicons-yes-alt" data-id="<?php echo $style; ?>" data-handler="enqueue" data-type="styles"></span>
                                 </td>
                             <td class="status"> Enqueued </td> 
+                            </tr>
+                        <?php }
+                    } 
+                    if ($dequeued_styles && $dequeued_styles != '') {
+                        foreach ($dequeued_styles as $dequeued_style) { ?>
+                            <tr>
+                                <td class="name"> <?php echo $dequeued_style; ?> </td>
+                                <td class="actions"> 
+                                    <span class="dashicons dashicons-dismiss" data-id="<?php echo $dequeued_style; ?>" data-handler="dequeue" data-type="styles"></span> 
+                                    <span class="dashicons dashicons-yes-alt" data-id="<?php echo $dequeued_style; ?>" data-handler="enqueue" data-type="styles"></span>
+                                </td>
+                            <td class="status"> Dequeued </td> 
                             </tr>
                         <?php }
                     } ?>    
@@ -241,26 +266,39 @@ class WPScriptManager {
 
     /**
      * @package WPScriptManager -> "scripts_handler"
-     * Handles enqueue/dequeue
+     * Handles enqueue/dequeue actions
      */
     public function scripts_handler() {
         if (!wp_verify_nonce($_POST['nonce'], 'metabox_nonce')) {
             die('You should not be here dumbass! Be Gone!');
         }
-        if (!$_POST['page_id'] || $_POST['page_id'] == '') {
-            echo 'no-page-id-provided';
-            die(); 
-        }
-        if (!$_POST['handler'] || $_POST['handler'] == '') {
-            echo 'no-handler-provided';
-            die(); 
-        }
         switch ($_POST['handler']) {
-            case 'enqueue':
-                echo 'Enqueue!';
-                break;
             case 'dequeue':
-                echo 'Dequeue!';
+                $dequeued_scripts = unserialize(get_option('wp_dequeued_' . $_POST['type'] . '_pageid_' . $_POST['page_id']));
+                if (!$dequeued_scripts || $dequeued_scripts == '') {
+                    $dequeued_scripts = array();
+                }
+                if (!in_array($_POST['script_id'], $dequeued_scripts)) {
+                    array_push($dequeued_scripts, $_POST['script_id']);
+                    update_option('wp_dequeued_' . $_POST['type'] . '_pageid_' . $_POST['page_id'], serialize($dequeued_scripts));
+                    $scripts = unserialize(get_option('wp_queued_' . $_POST['type'] . '_pageid_' . $_POST['page_id']));
+                    $key = array_search($_POST['script_id'], $scripts);
+                    array_splice($scripts, $key, 1);
+                    update_option( 'wp_queued_' . $_POST['type'] . '_pageid_' . $_POST['page_id'], serialize($scripts));
+                }
+                break;
+            case 'enqueue':
+                $dequeued_scripts = unserialize(get_option('wp_dequeued_' . $_POST['type'] . '_pageid_' . $_POST['page_id']));
+                if (!$dequeued_scripts || $dequeued_scripts == '') {
+                    break;
+                } else {
+                    $key = array_search($_POST['script_id'], $dequeued_scripts);
+                    array_splice($dequeued_scripts, $key, 1);
+                    update_option('wp_dequeued_' . $_POST['type'] . '_pageid_' . $_POST['page_id'], serialize($dequeued_scripts));
+                    $scripts = unserialize(get_option('wp_queued_' . $_POST['type'] . '_pageid_' . $_POST['page_id']));
+                    array_push($scripts, $_POST['script_id']);
+                    update_option( 'wp_queued_' . $_POST['type'] . '_pageid_' . $_POST['page_id'], serialize($scripts));
+                }
                 break;
         }
         die();
